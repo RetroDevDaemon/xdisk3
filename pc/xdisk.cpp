@@ -46,7 +46,7 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 	{
 		if (media == 1 || media == 3)
 		{
-			printf("‚±‚Ì 88 ‚Í 2D ê—p‹@‚Å‚·.\n");
+			printf("This 88 can only read 2D disks.\n");
 			return true;
 		}
 		media = 0;
@@ -72,7 +72,7 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 
 		if (media == 0xff)
 		{
-			printf("ƒfƒBƒXƒN‚Ìí—Ş‚ª“Á’è‚Å‚«‚Ü‚¹‚ñ.\n");
+			printf("Disk media type not set.\n");
 			return false;
 		}
 		if (media < 4)
@@ -81,7 +81,7 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 		}
 		if (media != 0xfe)
 		{
-			printf("ƒfƒBƒXƒN‘€ì‚ÉŠÖ‚·‚éƒGƒ‰[‚ª¶‚¶‚Ü‚µ‚½.\n");
+			printf("A disk control error occurred.\n");
 			return false;
 		}
 		printf("Insert disk into PC88 drive %d and press a key.\n", drive+1);
@@ -96,7 +96,7 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 	memset(&image, 0, sizeof(image));
 	strcpy(image.title, "made by xdisk2");
 	image.disktype = media == 3 ? 0x20 : media == 1 ? 0x10 : 0;
-	image.disksize = 0xdeadd13c;	// (–¢Š®¬ƒCƒ[ƒW‚ğ¦‚· MAGIC)
+	image.disksize = 0xdeadd13c;	// (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ MAGIC)
 	
 	file.Seek(0, FileIO::begin);
 	file.Write(&image, sizeof(image));
@@ -143,7 +143,7 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 }
 
 // ---------------------------------------------------------------------------
-//	ƒgƒ‰ƒbƒN‚Ì“à—e‚ğæ‚èo‚·
+//	ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½Ì“ï¿½ï¿½eï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½
 //
 int TransDisk2::ReceiveTrack(bool readnext, int track, FileIO & file)
 {
@@ -317,7 +317,7 @@ bool TransDisk2::ReceiveROM()
 
 			for (int i=0; i<rominfo[j].blocks; i++)
 			{
-				printf("ROM ƒf[ƒ^‚ğóM’† (%d/%d)\r", ++n, nblks);
+				printf("ROM ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ä¸­ (%d/%d)\r", ++n, nblks);
 				
 				uint8 cmd[3];
 				cmd[0] = 0x07;
@@ -338,7 +338,7 @@ bool TransDisk2::ReceiveROM()
 					return false;
 				}
 					
-				// 2D ŠÂ‹«‚Ì DISK ROM ‚Í 800h bytes
+				// 2D ï¿½Â‹ï¿½ï¿½ï¿½ DISK ROM ï¿½ï¿½ 800h bytes
 				if (j == 8 && GetSysInfo()->fddtype == 0)
 				{
 					file.Write(buf, 0x800);
@@ -356,7 +356,7 @@ bool TransDisk2::ReceiveROM()
 }
 
 // ---------------------------------------------------------------------------
-//	ƒfƒBƒXƒN‚Ì“à—e‚ğæ‚èo‚·
+//	ï¿½fï¿½Bï¿½Xï¿½Nï¿½Ì“ï¿½ï¿½eï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½
 //
 bool TransDisk2::SendDisk(int drive, FileIO& file)
 {
@@ -373,16 +373,16 @@ bool TransDisk2::SendDisk(int drive, FileIO& file)
 	
 	media = ih.disktype == 0x20 ? 3 : ih.disktype == 0x10 ? 1 : 0;
 
-	printf("[%.16s] (%s) ‚ğ‘‚«–ß‚µ‚Ü‚·.\n", ih.title, type[media]);
+	printf("Writing [%.16s] (%s)...\n", ih.title, type[media]);
 	if (!GetSysInfo()->fddtype && media)
 	{
-		printf("‚±‚Ì‹@í‚Å‚Í %s ‚ÌƒfƒBƒXƒNƒCƒ[ƒW‚Í‘‚«–ß‚µ‚Å‚«‚Ü‚¹‚ñD\n", type[media]);
+		printf("This unit cannot write back %s disk images.\n", type[media]);
 		return false;
 	}
 	
 	while (1)
 	{
-		printf("PC88 ‚Ìƒhƒ‰ƒCƒu %d ‚ÉV‚µ‚¢ƒfƒBƒXƒN‚ğ“ü‚ê‚ÄƒL[‚ğ‰Ÿ‚µ‚Ä‚­‚¾‚³‚¢.\n", drive+1, type[media]);
+		printf("Please insert a new disk into PC88 drive %d and press a key.\n", drive+1, type[media]);
 		getchar();
 		
 		// SET DRIVE
@@ -405,13 +405,13 @@ bool TransDisk2::SendDisk(int drive, FileIO& file)
 	
 		if (buffer[0] == 0xf9)
 		{
-			printf("ƒfƒBƒXƒN‚Íƒ‰ƒCƒgƒvƒƒeƒNƒg‚³‚ê‚Ä‚¢‚Ü‚·.\n");
+			printf("Disk is write-protected.\n");
 			return false;
 		}
 
 		if (buffer[0] != 0xfe)
 		{
-			printf("ƒfƒBƒXƒN‘€ì‚ÉŠÖ‚·‚éƒGƒ‰[‚ª¶‚¶‚Ü‚µ‚½.\n");
+			printf("A disk control error occurred.\n");
 			return false;
 		}
 	}
@@ -601,7 +601,7 @@ void TransDisk2::MakeNormalID(uint8*& dest, IDR* idr, int nsec, int le)
 }
 
 // ----------------------------------------------------------------------------
-//	ƒ~ƒbƒNƒXƒŒƒ“ƒNƒgƒ‰ƒbƒNƒtƒH[ƒ}ƒbƒg
+//	ï¿½~ï¿½bï¿½Nï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½g
 //
 void TransDisk2::MakeMixLengthID(uint8*& dest, IDR* idr, int nsec, int le, int gap)
 {
@@ -642,8 +642,8 @@ void TransDisk2::MakeMixLengthID(uint8*& dest, IDR* idr, int nsec, int le, int g
 }
 
 // ----------------------------------------------------------------------------
-//	ƒ~ƒbƒNƒXƒZƒNƒ^ƒgƒ‰ƒbƒNƒtƒH[ƒ}ƒbƒg
-//	Å“K‚ÈƒtƒH[ƒ}ƒbƒgƒpƒ^[ƒ“‚Ì’Tõ
+//	ï¿½~ï¿½bï¿½Nï¿½Xï¿½Zï¿½Nï¿½^ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½g
+//	ï¿½Å“Kï¿½Èƒtï¿½Hï¿½[ï¿½}ï¿½bï¿½gï¿½pï¿½^ï¿½[ï¿½ï¿½ï¿½Ì’Tï¿½ï¿½
 //
 bool TransDisk2::CalcMixLengthCondition(IDR* idr, int nsec, int* mle, int* mgap, int tracksize)
 {
@@ -685,7 +685,7 @@ bool TransDisk2::CalcMixLengthCondition(IDR* idr, int nsec, int* mle, int* mgap,
 }
 
 // ---------------------------------------------------------------------------
-//	ƒwƒbƒ_[’†‚Ì‚²‚İî•ñ‚Ìíœ
+//	ï¿½wï¿½bï¿½_ï¿½[ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½İï¿½ï¿½Ìíœ
 //
 bool TransDisk2::CheckHeader(ImageHeader* ih)
 {

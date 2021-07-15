@@ -4,16 +4,6 @@
 // ---------------------------------------------------------------------------
 //	$Id: main.cpp,v 1.11 2000/02/01 13:09:23 cisc Exp $
 
-#define MAX_PATH 260
-
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <unistd.h>     // unix
-#include <fcntl.h>      // file control
-#include <errno.h>      // error number definitions
-#include <termios.h>    // posix terminal stuff
-#include <sys/ioctl.h>
 
 #include "headers.h"
 //#include <mbstring.h> 

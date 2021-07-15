@@ -23,33 +23,7 @@
 class DCB 
 {
 public: 
-	uint32 DCBlength;
 	uint32 BaudRate;	//	= baud;
-	uint32 fBinary;		//= TRUE;
-	uint32 fParity;		//= FALSE;
-	uint32 fOutxCtsFlow;	//= TRUE;
-	uint32 fOutxDsrFlow;	//= TRUE;
-	uint32 fDtrControl;	//	= DTR_CONTROL_ENABLE;
-	uint32 fDsrSensitivity;	//= FALSE;
-	uint32 fTXContinueOnXoff; //	= FALSE;
-	uint32 fOutX;		//= TRUE;
-	uint32 fInX;		//= FALSE;
-	uint32 fErrorChar;
-	uint32 fNull;		//= FALSE;
-	uint32 fRtsControl;	//	= RTS_CONTROL_HANDSHAKE;
-	uint32 fAbortOnError;	//= FALSE;
-	uint32 fDummy2;
-	uint16 wReserved;
-	uint16 XonLim;
-	uint8 ByteSize;	//	= 8;
-	uint8 Parity;		//= NOPARITY;
-	uint8 StopBits;	//	= ONESTOPBIT;
-	char XonChar;
-	char XoffChar;
-	char ErrorChar;
-	char EofChar;
-	char EvtChar;		//= 10;
-	uint16 wReserved1;
 	struct termios config;
 	
 

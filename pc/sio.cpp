@@ -68,14 +68,11 @@ SIO::Result SIO::Read(void* dest, int len)
 {
 	//DWORD readsize;
 	size_t readsize;
-	//printf("trying read...\n");
 	for(int f = 0; f < 3; f++)
 	{
 		readsize = read(serialport, dest, len);// fread(dest, 1, len, hfile);
 		if(readsize == len) f = 4;
 	}
-	//printf("read ok\n");
-	//return OK; //FIXME
 	//if (ReadFile(hfile, dest, len, &readsize, 0))
 	//{
 	//	if (int(readsize) == len)
@@ -95,10 +92,8 @@ SIO::Result SIO::Read(void* dest, int len)
 //
 SIO::Result SIO::Open(int port, int baud)
 {
-	// if a file is open, close it?
 	//if (hfile != INVALID_HANDLE_VALUE)
 	//	Close();
-	//printf("a");
 	//if (port < 1)
 	//	return ERRINVALID;
 	//char buf[16];
@@ -128,7 +123,6 @@ SIO::Result SIO::Open(int port, int baud)
 	//GetCommState(hfile, &dcb); < tcgetattr
 	// Get the current serial port status, try to set baud, and reset attr
 	tcgetattr(serialport, &dcb.config);
-	//printf("file no: %d\n", serialport);
 	if (!SetMode(baud))
 	{
 		Close();

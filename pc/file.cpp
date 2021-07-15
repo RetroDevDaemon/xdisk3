@@ -75,13 +75,9 @@ bool FileIO::Open(const char* filename, uint flg)
 		//}
 	}
 	
-	// Open a new file using name 'filename'. Ignore flags for now.
-	//hfile = fopen(filename, "rb");
-
-	SetLogicalOrigin(0); // fseek(hfile, 0, SEEK_SET); i think
+	SetLogicalOrigin(0); 
 
 	return !!(flags & open);
-	//return true;
 }
 
 // ---------------------------------------------------------------------------

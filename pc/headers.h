@@ -6,6 +6,16 @@
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_IE		0x200
+#define MAX_PATH 260
+
+//#include <stdio.h>
+#include <ctype.h>
+//#include <string.h>
+#include <unistd.h>     // unix
+#include <fcntl.h>      // file control
+#include <errno.h>      // error number definitions
+#include <termios.h>    // posix terminal stuff
+#include <sys/ioctl.h>
 
 //#include <windows.h>
 #include <stdio.h>

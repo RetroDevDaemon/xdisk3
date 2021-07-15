@@ -148,7 +148,7 @@ uint XComm2::SendPacket(const uint8* buffer, int length, bool cmd, bool data)
 			
 			InitPack();
 			if (cmd) index++;
-		printf("SEND[%.4x][%.4x]\n", index, length);
+		//printf("SEND[%.4x][%.4x]\n", index, length);
 			SendWord(index);
 			SendWord(length);
 			
@@ -206,7 +206,7 @@ uint XComm2::RecvPacket(uint8* buffer, int length, bool burst)
 			continue;
 		}
 	//	printf(".\n");		
-		printf("<%.2x>\n", c);
+		//printf("<%.2x>\n", c);
 	} while (c != '%' && c != '#' && c != '$');
 	//printf("loop over\n");
 	try
@@ -214,12 +214,12 @@ uint XComm2::RecvPacket(uint8* buffer, int length, bool burst)
 		InitPack();
 		uint i = RecvWord();
 		if (i != index){
-			printf("protocol fail\n");
+			//printf("protocol fail\n");
 			Throw(e_protocol);
 		}
 
 		uint l = RecvWord() & 0x3fff;
-		printf("RECV[%.4x][%.4x(%.4x)]\n", index, l, length);
+		//printf("RECV[%.4x][%.4x(%.4x)]\n", index, l, length);
 		
 		if (c != '$')
 		{

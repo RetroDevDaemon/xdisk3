@@ -58,7 +58,6 @@ public:
 	Error GetError() { return error; }
 
 	int32 Read(void* dest, int32 len);
-	bool ReadFile(FILE* file, void* dest, int32 size, int32* rdsize);
 	int32 Write(const void* src, int32 len);
 	bool Seek(int32 fpos, SeekMethod method);
 	int32 Tellp();

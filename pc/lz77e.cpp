@@ -227,7 +227,7 @@ int  LZ77Enc::Encode(const void* _s, int len, uint8* _d, uint dsize)
 	AddHashTable(src, h);
 	
 	const uint8* s = src;
-	for (const uint8* s = src+1; s < srctop-2; )
+	for (s = src+1; s < srctop-2; )
 	{
 		int best = threshold - 1;
 		const uint8* matchpos;
