@@ -2,7 +2,7 @@
 
 This is a port of cisc-san's excellent xdisk2, an RS232 PC-88xx disk and ROM read/write tool, for unix systems (using file-type read and write operations). 
 
-Currently only supports writing images at 9600 baud. 
+Currently only supports writing images, but supports both baudrates.
 
 From the `pc` folder simply type `make`. Run the file to see usage(). 
 
