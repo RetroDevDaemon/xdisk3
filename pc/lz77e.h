@@ -45,7 +45,6 @@ private:
 	int obit;
 	int bptr;
 	FILE* fp;
-	//uint8* s; // FIXME
 };
 
 #endif // incl_lz77e_h

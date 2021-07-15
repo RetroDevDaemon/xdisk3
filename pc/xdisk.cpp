@@ -29,13 +29,13 @@ TransDisk2::~TransDisk2()
 uint TransDisk2::Connect(int port, int baud, bool bm)
 {
 	uint r = XComm2::Connect(port, baud);
-	//burst = (GetSysInfo()->siotype && baud == 19200) ? bm : false;
-	burst = false;
+	
+	burst = (GetSysInfo()->siotype && baud == 19200) ? bm : false;
 	return r;
 }
 
 // ---------------------------------------------------------------------------
-//	?f?B?X?N????e?????o??
+//	ディスクの内容を取り出す
 //
 bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 {
@@ -84,13 +84,13 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 			printf("ディスク操作に関するエラーが生じました.\n");
 			return false;
 		}
-		printf("Insert disk into PC88 drive %d and press a key.\n", drive+1);
+		printf("PC88 のドライブ %d にディスクを入れてキーを押してください.\n", drive+1);
 		getchar();
 	}
 
 	int ntracks = media & 1 ? 164 : 84;
 	const char* type[] = { "2D", "2DD", "???", "2HD" };
-	printf("Disk type is %s\n", type[media]);
+	printf("ディスクの種類は %s です.\n", type[media]);
 
 	ImageHeader image;
 	memset(&image, 0, sizeof(image));
@@ -109,11 +109,10 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 		return false;
 	
 	int bt;
-	//if (puttime)
-		//bt = GetTickCount();
+	if (puttime)
+		bt = GetTickCount();
 	int l;
-	int tr;
-	for (tr=0; tr<ntracks-1; tr++)
+	for (int tr=0; tr<ntracks-1; tr++)
 	{
 		image.trackptr[tr] = file.Tellp();
 
@@ -130,8 +129,8 @@ bool TransDisk2::ReceiveDisk(int drive, int m, FileIO & file)
 	if (!l)
 		image.trackptr[tr] = 0;
 
-	if (puttime) printf("tick\n");
-	//	printf("%d ms.\n", GetTickCount() - bt);
+	if (puttime)
+		printf("%d ms.\n", GetTickCount() - bt);
 	
 	image.disksize = file.Tellp();
 	file.Seek(0, FileIO::begin);
@@ -270,7 +269,7 @@ void TransDisk2::IDDecompress(XD2IDR* idr, int nsecs, int track)
 }
 
 // ---------------------------------------------------------------------------
-//	ROM ?f?[?^?????o??
+//	ROM データを取り出す
 //
 bool TransDisk2::ReceiveROM()
 {
@@ -296,7 +295,7 @@ bool TransDisk2::ReceiveROM()
 		{ "jisyo.rom",	0x70, 0x80 },
 	};
 
-	// ???????? ROM ??I??
+	// 読み込むべき ROM を選ぶ
 	uint bitmap = 0x1fc;
 	uint nblks = 0x1a;
 	uint8 romtype = GetSysInfo()->romtype;
@@ -487,7 +486,7 @@ bool TransDisk2::SendDisk(int drive, FileIO& file)
 }
 
 // ---------------------------------------------------------------------------
-//	?g???b?N????????
+//	トラック書き込み
 //
 int TransDisk2::MakeWriteSeq(uint8* dest, IDR* idr, int nsec)
 {
@@ -558,7 +557,7 @@ int TransDisk2::MakeWriteSeq(uint8* dest, IDR* idr, int nsec)
 }
 
 // ----------------------------------------------------------------------------
-//	?m?[?}???g???b?N?t?H?[?}?b?g
+//	ノーマルトラックフォーマット
 //
 void TransDisk2::MakeNormalID(uint8*& dest, IDR* idr, int nsec, int le)
 {

@@ -7,12 +7,12 @@
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_IE		0x200
 
-//#include <windows.h>
+#include <windows.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <process.h>
+#include <process.h>
 #include <assert.h>
 
 #ifdef _MSC_VER

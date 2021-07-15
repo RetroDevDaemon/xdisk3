@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-//	TransDisk/88 ï¿½Æ‚ÌŒï¿½Mï¿½Nï¿½ï¿½ï¿½X
+//	TransDisk/88 ‚Æ‚ÌŒğMƒNƒ‰ƒX
 //	Copyright (C) 2000 cisc.
 // ---------------------------------------------------------------------------
 //	$Id: xcom.cpp,v 1.7 2000/01/21 01:57:47 cisc Exp $
@@ -14,7 +14,7 @@ extern bool verbose;
 extern int version_l;
 
 // ---------------------------------------------------------------------------
-//	ï¿½\ï¿½zï¿½Eï¿½jï¿½ï¿½
+//	\’zE”jŠü
 //
 XComm2::XComm2()
 : connect(false)
@@ -29,29 +29,24 @@ XComm2::~XComm2()
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½Ú‘ï¿½
+//	Ú‘±
 //
 uint XComm2::Connect(int port, int _baud)
 {
 	Disconnect();
 	baud = _baud;
-	
 	if (sio.Open(port, baud) != SIO::OK)
 		return e_port;
 	
 	sio.SetTimeouts(1000);
-	
 	uint e;
-	
+
 	static const uint8 cmd[] = { 0x01 };
-	
 	if ((e = SendPacket(cmd, 1, true)) != s_ok)
 	{
-		//printf("sendpacket fail...\n");	
 		sio.Close();
 		return e;
 	}
-	//printf("sendpacket ok?\n");
 	
 	if ((e = RecvPacket((uint8*) &si, sizeof(si))) != s_ok)
 	{
@@ -61,7 +56,7 @@ uint XComm2::Connect(int port, int _baud)
 
 	if (si.verh != 2 || si.verl < version_l)
 	{
-		fprintf(stderr, "Version on 88 does not match.\n");
+		fprintf(stderr, "88 ‘¤‚Ìƒo[ƒWƒ‡ƒ“‚ªˆê’v‚µ‚Ü‚¹‚ñ.\n");
 		sio.Close();
 		return e_version;
 	}
@@ -69,15 +64,15 @@ uint XComm2::Connect(int port, int _baud)
 	{
 		printf("xdisk88: version is %d.%.2d\n", si.verh, si.verl);
 		printf("pc88 has %s drive(s).\n", si.fddtype ? "2HD" : "2D");
-		printf("rom bitmap is %.2x (Kanji 1:%d, Kanji 2:%d, Jisho:%d, CD:%d)\n", si.romtype,
+		printf("rom bitmap is %.2x (Š¿š1:%d, Š¿š2:%d, «‘:%d, CD:%d)\n", si.romtype,
 			!!(si.romtype & 1),
 			!!(si.romtype & 2),
 			!!(si.romtype & 4),
 			!!(si.romtype & 8)
 			);
-		printf("pc88 has %s-rate serial port.\n", si.siotype ? "variable" : "fixed");
+		printf("pc88 has %s-rate serial port.\n", si.siotype ? "valiable" : "fixed");
 	}
-	
+
 	unc = -1;
 	connect = true;
 	sio.SetTimeouts(10000);
@@ -85,7 +80,7 @@ uint XComm2::Connect(int port, int _baud)
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½Ú‘ï¿½ï¿½ï¿½ï¿½ï¿½
+//	Ú‘±‚ğâ‚Â
 //
 uint XComm2::Disconnect()
 {
@@ -98,7 +93,7 @@ uint XComm2::Disconnect()
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½pï¿½Pï¿½bï¿½gï¿½ğ‘—‚ï¿½
+//	ƒpƒPƒbƒg‚ğ‘—‚é
 //
 uint XComm2::SendPacket(const uint8* buffer, int length, bool cmd, bool data)
 {
@@ -137,18 +132,16 @@ uint XComm2::SendPacket(const uint8* buffer, int length, bool cmd, bool data)
 	uint err = e_connect;
 	for (i=3; i>0; i--)
 	{
-		//printf("errored?\n");
-	
 		try
 		{
-			// ï¿½wï¿½bï¿½_ï¿½ï¿½ï¿½ï¿½
+			// ƒwƒbƒ_•¶š
 			uint8 hdr = cmd ? '!' : data ? '$' : '#';
 			if (SIO::OK != sio.Write(&hdr, 1))
 				Throw(e_connect);
-			
+
 			InitPack();
 			if (cmd) index++;
-		printf("SEND[%.4x][%.4x]\n", index, length);
+//		printf("SEND[%.4x][%.4x]\n", index, length);
 			SendWord(index);
 			SendWord(length);
 			
@@ -158,10 +151,9 @@ uint XComm2::SendPacket(const uint8* buffer, int length, bool cmd, bool data)
 			SendWord(crc, false);
 			SendFlush();
 
-			
 			if (!cmd)
 				return s_ok;
-			
+
 			uint8 buf;
 			if (RecvPacket(&buf, 1) == s_ok)
 			{
@@ -169,8 +161,6 @@ uint XComm2::SendPacket(const uint8* buffer, int length, bool cmd, bool data)
 					Throw(e_protocol);
 				return s_ok;
 			}
-			
-	
 		}
 		catch (XERR xe)
 		{
@@ -181,18 +171,19 @@ uint XComm2::SendPacket(const uint8* buffer, int length, bool cmd, bool data)
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½pï¿½Pï¿½bï¿½gï¿½ï¿½ï¿½ó‚¯ï¿½ï¿½
-//	TODO:	ï¿½ï¿½ï¿½kï¿½fï¿½[ï¿½^ï¿½Î‰ï¿½
-//			ï¿½Ä‘ï¿½
+//	ƒpƒPƒbƒg‚ğó‚¯æ‚é
+//	TODO:	ˆ³kƒf[ƒ^‘Î‰
+//			Ä‘—
 //
 uint XComm2::RecvPacket(uint8* buffer, int length, bool burst)
 {
 	uint count = 3;
 	uint8 recvbuf[0x4000];
 	uint8 c;
-	//if (burst) 
-	//	unc = -1, sio.SetMode(baud * 2);
-	//unc = 1;
+
+	if (burst) 
+		unc = -1, sio.SetMode(baud * 2);
+
 	do
 	{
 		if (unc != -1)
@@ -205,21 +196,18 @@ uint XComm2::RecvPacket(uint8* buffer, int length, bool burst)
 				return e_connect;
 			continue;
 		}
-	//	printf(".\n");		
-		printf("<%.2x>\n", c);
+//		printf("<%.2x>", c);
 	} while (c != '%' && c != '#' && c != '$');
-	//printf("loop over\n");
+
 	try
 	{
 		InitPack();
 		uint i = RecvWord();
-		if (i != index){
-			printf("protocol fail\n");
+		if (i != index)
 			Throw(e_protocol);
-		}
 
 		uint l = RecvWord() & 0x3fff;
-		printf("RECV[%.4x][%.4x(%.4x)]\n", index, l, length);
+//		printf("RECV[%.4x][%.4x(%.4x)]", index, l, length);
 		
 		if (c != '$')
 		{
@@ -264,7 +252,7 @@ uint XComm2::RecvPacket(uint8* buffer, int length, bool burst)
 }
 
 // ---------------------------------------------------------------------------
-//	CRC ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Ìì¬
+//	CRC ƒe[ƒuƒ‹‚Ìì¬
 //
 void XComm2::BuildCRCTable()
 {
@@ -278,7 +266,7 @@ void XComm2::BuildCRCTable()
 }
 
 // ---------------------------------------------------------------------------
-//	7bit format ï¿½É‚ï¿½ï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½Ì“Ç‚İï¿½ï¿½ï¿½
+//	7bit format ‚É‚æ‚éƒoƒCƒiƒŠ‚Ì“Ç‚İ‚İ
 //
 int XComm2::RecvByte(bool cc)
 {
@@ -294,7 +282,7 @@ int XComm2::RecvByte(bool cc)
 }
 
 // ---------------------------------------------------------------------------
-//	7bit format ï¿½É‚ï¿½ï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½Ì‘ï¿½ï¿½M
+//	7bit format ‚É‚æ‚éƒoƒCƒiƒŠ‚Ì‘—M
 //
 void XComm2::SendByte(int a, bool cc)
 {
@@ -354,7 +342,7 @@ bool XComm2::DecompressPacket(uint8* buf, uint bufsize, const uint8* src, uint p
 
 	switch (method)
 	{
-	case 0:		// ï¿½ï¿½ï¿½ï¿½ï¿½k
+	case 0:		// –³ˆ³k
 		memcpy(buf, src, exsize);
 		return true;
 
@@ -391,7 +379,7 @@ bool XComm2::DecompressPacket(uint8* buf, uint bufsize, const uint8* src, uint p
 			if (verbose) 
 				printf("(%.4x-%.4x)", dcrc & 0xffff, src - st);
 			if (((dcrc ^ crc) & 0xffff) || pksize - (src - st))
-				printf("xcom: ï¿½ï¿½ï¿½kï¿½fï¿½[ï¿½^ï¿½Ì“Wï¿½Jï¿½Éï¿½ï¿½s\n");
+				printf("xcom: ˆ³kƒf[ƒ^‚Ì“WŠJ‚É¸”s\n");
 		}
 
 		return true;

@@ -8,17 +8,6 @@
 #define win32_file_h
 
 #include "types.h"
-// These are fake!
-#define GENERIC_WRITE 0x1
-#define GENERIC_READ 0x2
-#define FILE_SHARE_READ 0x4
-#define CREATE_ALWAYS 0x8
-#define OPEN_ALWAYS 0x10
-#define OPEN_EXISTING 0x20
-#define INVALID_HANDLE_VALUE (FILE*)0x40
-
-#define MAX_PATH 260
-#define DWORD uint32 
 
 // ---------------------------------------------------------------------------
 
@@ -58,7 +47,6 @@ public:
 	Error GetError() { return error; }
 
 	int32 Read(void* dest, int32 len);
-	bool ReadFile(FILE* file, void* dest, int32 size, int32* rdsize);
 	int32 Write(const void* src, int32 len);
 	bool Seek(int32 fpos, SeekMethod method);
 	int32 Tellp();
@@ -68,8 +56,7 @@ public:
 	void SetLogicalOrigin(int32 origin) { lorigin = origin; }
 
 private:
-	//HANDLE hfile;
-	FILE* hfile;
+	HANDLE hfile;
 	uint flags;
 	uint32 lorigin;
 	Error error;

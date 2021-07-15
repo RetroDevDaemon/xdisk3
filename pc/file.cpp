@@ -5,10 +5,10 @@
 //	$Id: file.cpp,v 1.2 2000/01/13 13:39:58 cisc Exp $
 
 #include "headers.h"
-#include "file.h"
+#include "File.h"
 
 // ---------------------------------------------------------------------------
-//	ï¿½\ï¿½z/ï¿½ï¿½ï¿½ï¿½
+//	\’z/Á–Å
 //
 FileIO::FileIO()
 {
@@ -27,9 +27,8 @@ FileIO::~FileIO()
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½ï¿½
+//	ƒtƒ@ƒCƒ‹‚ğŠJ‚­
 //
-// Ignoring flags, this simply opens a file pointer for reading.
 bool FileIO::Open(const char* filename, uint flg)
 {
 	Close();
@@ -39,127 +38,97 @@ bool FileIO::Open(const char* filename, uint flg)
 	DWORD access = (flg & readonly ? 0 : GENERIC_WRITE) | GENERIC_READ;
 	DWORD share = (flg & readonly) ? FILE_SHARE_READ : 0;
 	DWORD creation = flg & create ? CREATE_ALWAYS : (flg & openalways) ? OPEN_ALWAYS : OPEN_EXISTING;
-	/*
-	hfile = CreateFile(filename, 	// lpFileName
-			access, 	// dwDesiredAccess
-			share, 		// dwShareMode
-			0, 		// lpSecurityAttributes
-			creation, 	// dwCreationDisposition
-			0, 		// dwFlagsAndAttributes
-			0);		// hTemplateFile
-	*/
-	// opening files in read only mode is the only thing that work satm
-	if ( flg & readonly )
-	{
-		hfile = fopen(filename, "rb");
-	}
-	else
-	{
-		hfile = fopen(filename, "wb");
-	}
+
+	hfile = CreateFile(filename, access, share, 0, creation, 0, 0);
+	
 	flags = (flg & readonly) | (hfile == INVALID_HANDLE_VALUE ? 0 : open);
 	if (!(flags & open))
 	{
-		//GetLastError is windows ish
-		//switch (GetLastError())
-		//{
-		//	case ERROR_FILE_NOT_FOUND:		
-		//		error = file_not_found; 
-		//		break;
-		//	case ERROR_SHARING_VIOLATION:	
-		//		error = sharing_violation; 
-		//		break;
-		//	default: 
-				error = unknown; 
-		//		break;
-		//}
+		switch (GetLastError())
+		{
+		case ERROR_FILE_NOT_FOUND:		error = file_not_found; break;
+		case ERROR_SHARING_VIOLATION:	error = sharing_violation; break;
+		default: error = unknown; break;
+		}
 	}
-	
-	// Open a new file using name 'filename'. Ignore flags for now.
-	//hfile = fopen(filename, "rb");
-
-	SetLogicalOrigin(0); // fseek(hfile, 0, SEEK_SET); i think
+	SetLogicalOrigin(0);
 
 	return !!(flags & open);
-	//return true;
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Íì¬
+//	ƒtƒ@ƒCƒ‹‚ª‚È‚¢ê‡‚Íì¬
 //
-// This is never used in the program.
 bool FileIO::CreateNew(const char* filename)
 {
 	Close();
 
 	strncpy(path, filename, MAX_PATH);
 
-	//DWORD access = GENERIC_WRITE | GENERIC_READ;
-	//DWORD share = 0;
-	//DWORD creation = CREATE_NEW;
+	DWORD access = GENERIC_WRITE | GENERIC_READ;
+	DWORD share = 0;
+	DWORD creation = CREATE_NEW;
 
-	//hfile = CreateFile(filename, access, share, 0, creation, 0, 0);
-	hfile = fopen(filename, "wb");
-	//flags = (hfile == INVALID_HANDLE_VALUE ? 0 : open);
+	hfile = CreateFile(filename, access, share, 0, creation, 0, 0);
+	
+	flags = (hfile == INVALID_HANDLE_VALUE ? 0 : open);
 	SetLogicalOrigin(0);
 
-	return true;
-	//return !!(flags & open);
+	return !!(flags & open);
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è’¼ï¿½ï¿½
+//	ƒtƒ@ƒCƒ‹‚ğì‚è’¼‚·
 //
-/// I don't know what to do with this!
 bool FileIO::Reopen(uint flg)
 {
-	//if (!(flags & open)) return false;
-	//if ((flags & readonly) && (flg & create)) return false;
+	if (!(flags & open)) return false;
+	if ((flags & readonly) && (flg & create)) return false;
 
-	//if (flags & readonly) flg |= readonly;
+	if (flags & readonly) flg |= readonly;
 
-	//Close();
+	Close();
 
-	//DWORD access = (flg & readonly ? 0 : GENERIC_WRITE) | GENERIC_READ;
-	//DWORD share = flg & readonly ? FILE_SHARE_READ : 0;
-	//DWORD creation = flg & create ? CREATE_ALWAYS : OPEN_EXISTING;
+	DWORD access = (flg & readonly ? 0 : GENERIC_WRITE) | GENERIC_READ;
+	DWORD share = flg & readonly ? FILE_SHARE_READ : 0;
+	DWORD creation = flg & create ? CREATE_ALWAYS : OPEN_EXISTING;
 
-	//hfile = CreateFile(path, access, share, 0, creation, 0, 0);
+	hfile = CreateFile(path, access, share, 0, creation, 0, 0);
 	
-	//flags = (flg & readonly) | (hfile == INVALID_HANDLE_VALUE ? 0 : open);
+	flags = (flg & readonly) | (hfile == INVALID_HANDLE_VALUE ? 0 : open);
 	SetLogicalOrigin(0);
 
-	return true;
-	//return !!(flags & open);
+	return !!(flags & open);
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½
+//	ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
 //
 void FileIO::Close()
 {
 	if (GetFlags() & open)
 	{
-		//CloseHandle(hfile);
-		fclose(hfile);
+		CloseHandle(hfile);
 		flags = 0;
 	}
 }
+
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½kï¿½Ì“Ç‚İoï¿½ï¿½
+//	ƒtƒ@ƒCƒ‹Šk‚Ì“Ç‚İo‚µ
 //
 int32 FileIO::Read(void* dest, int32 size)
 {
 	if (!(GetFlags() & open))
 		return -1;
 	
-	size_t readsize; // I erased ReadFile oops
-	readsize = fread(dest, 1, size, hfile);
+	DWORD readsize;
+	if (!ReadFile(hfile, dest, size, &readsize, 0))
+		return -1;
 	return readsize;
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ö‚Ìï¿½ï¿½ï¿½ï¿½oï¿½ï¿½
+//	ƒtƒ@ƒCƒ‹‚Ö‚Ì‘‚«o‚µ
 //
 int32 FileIO::Write(const void* dest, int32 size)
 {
@@ -167,14 +136,13 @@ int32 FileIO::Write(const void* dest, int32 size)
 		return -1;
 	
 	DWORD writtensize;
-	//if (!WriteFile(hfile, dest, size, &writtensize, 0))
-	//	return -1;
-	writtensize = fwrite(dest, 1, size, hfile);
+	if (!WriteFile(hfile, dest, size, &writtensize, 0))
+		return -1;
 	return writtensize;
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Vï¿½[ï¿½N
+//	ƒtƒ@ƒCƒ‹‚ğƒV[ƒN
 //
 bool FileIO::Seek(int32 pos, SeekMethod method)
 {
@@ -182,49 +150,41 @@ bool FileIO::Seek(int32 pos, SeekMethod method)
 		return false;
 	
 	DWORD wmethod;
-	int s;
 	switch (method)
 	{
 	case begin:	
-		wmethod = SEEK_SET; 
-		s = fseek(hfile, pos, SEEK_SET);
-		pos += lorigin; 
+		wmethod = FILE_BEGIN; pos += lorigin; 
 		break;
-	case current:
-		s = fseek(hfile, pos, SEEK_CUR);	
-		wmethod = SEEK_CUR; 
+	case current:	
+		wmethod = FILE_CURRENT; 
 		break;
 	case end:		
-		s = fseek(hfile, pos, SEEK_END);
-		wmethod = SEEK_END; 
+		wmethod = FILE_END; 
 		break;
 	default:
 		return false;
 	}
-	if (s == 0) return true;
-	else return false;
-	//return 0xffffffff != SetFilePointer(hfile, pos, 0, wmethod);
+
+	return 0xffffffff != SetFilePointer(hfile, pos, 0, wmethod);
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌˆÊ’uï¿½ğ“¾‚ï¿½
+//	ƒtƒ@ƒCƒ‹‚ÌˆÊ’u‚ğ“¾‚é
 //
 int32 FileIO::Tellp()
 {
 	if (!(GetFlags() & open))
 		return 0;
-	// returns the int32 offset into the file. 
-	return ftell(hfile) - lorigin;
-	//return SetFilePointer(hfile, 0, 0, FILE_CURRENT) - lorigin;
+
+	return SetFilePointer(hfile, 0, 0, FILE_CURRENT) - lorigin;
 }
 
 // ---------------------------------------------------------------------------
-//	ï¿½ï¿½ï¿½İ‚ÌˆÊ’uï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌIï¿½[ï¿½Æ‚ï¿½ï¿½ï¿½
+//	Œ»İ‚ÌˆÊ’u‚ğƒtƒ@ƒCƒ‹‚ÌI’[‚Æ‚·‚é
 //
 bool FileIO::SetEndOfFile()
 {
 	if (!(GetFlags() & open))
 		return false;
-	//return ::SetEndOfFile(hfile) != 0;
-	return fseek(hfile, 0, SEEK_END);
+	return ::SetEndOfFile(hfile) != 0;
 }

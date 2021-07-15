@@ -4,19 +4,8 @@
 // ---------------------------------------------------------------------------
 //	$Id: main.cpp,v 1.11 2000/02/01 13:09:23 cisc Exp $
 
-#define MAX_PATH 260
-
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <unistd.h>     // unix
-#include <fcntl.h>      // file control
-#include <errno.h>      // error number definitions
-#include <termios.h>    // posix terminal stuff
-#include <sys/ioctl.h>
-
 #include "headers.h"
-//#include <mbstring.h> 
+#include <mbstring.h>
 #include "types.h"
 #include "xdisk.h"
 #include "file.h"
@@ -45,9 +34,8 @@ int main(int ac, char** av)
 	uint port = 1;
 	int index = 1;
 
-	printf("TransDisk 3.%.2d\n"
-		   "Copyright (C) 2000 cisc.\n"
-		   "Unix port (C) 2021 b.f. \n\n", version_l);
+	printf("TransDisk 2.%.2d\n"
+		   "Copyright (C) 2000 cisc.\n\n", version_l);
 
 	if (ac < 2)
 		Usage();
@@ -134,25 +122,20 @@ next:
 		}
 	}
 
-	//printf("é€šä¿¡ãƒãƒ¼ãƒˆ %d, %d bps ã§æ¥ç¶šã—ã¾ã™.\n\n", port, baud);
-	printf("Connected to port %d at %d bps.\n\n", port, baud);
+	printf("’ÊMƒ|[ƒg %d, %d bps ‚ÅÚ‘±‚µ‚Ü‚·.\n\n", port, baud);
+
 	if (mode == 'b')
 	{
 		SIO sio;
 		if (SIO::OK != sio.Open(port, baud))
 		{
-			//printf("é€šä¿¡ãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ–ã«å¤±æ•—ã—ã¾ã—ãŸ.\n");
-			printf("Failed to initialize serial device.");
-			//printf("basic fail");
+			printf("’ÊMƒfƒoƒCƒX‚Ì‰Šú‰»‚É¸”s‚µ‚Ü‚µ‚½.\n");
 			return 1;
 		}
 
-		//printf( "88 ã«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’è»¢é€ã—ã¾ã™ã€‚\n"
-		//	"88 ã§ load \042COM:N81X\042 ã¨ã„ã†ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã—ã¦ãã ã•ã„ã€‚\n\n"
-		//	"ã‚ˆã‚ã—ã„ã§ã™ã‹ ?");
-		printf("Sending program to the 88.\n"
-			"Please run the following command on your 88: load\"COM:N81X\"\n\n"
-			"Ready?");
+		printf( "88 ‚ÉƒvƒƒOƒ‰ƒ€‚ğ“]‘—‚µ‚Ü‚·B\n"
+				"88 ‚Å load \042COM:N81X\042 ‚Æ‚¢‚¤ƒRƒ}ƒ“ƒh‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B\n\n"
+				"‚æ‚ë‚µ‚¢‚Å‚·‚© ?");
 
 		getchar();
 		printf("\n");
@@ -167,22 +150,20 @@ next:
 			int fs = size;
 			while (fs > 0)
 			{
-				//printf("è»¢é€ä¸­ (%d%%).\r", (size-fs) * 100 / size);
-				printf("Transferring (%d%%).\r", (size-fs) * 100 / size);
+				printf("“]‘—’† (%d%%).\r", (size-fs) * 100 / size);
+				
 				uint8 buf[512];
 				uint ps = fs > sizeof(buf) ? sizeof(buf) : fs;
 				fio.Read(buf, ps);
 				if (SIO::OK != sio.Write(buf, ps))
 				{
-					//printf("è»¢é€ã§ãã¾ã›ã‚“ã§ã—ãŸ.\n");
-					printf("Transfer failed.\n");
+					printf("“]‘—‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½.\n");
 					return 0;
 				}
 
 				fs -= ps;
 			}
-			printf("Completed.\n");
-			//printf("å®Œäº†ã—ã¾ã—ãŸ.\n");
+			printf("Š®—¹‚µ‚Ü‚µ‚½.\n");
 		}
 		return 0;
 	}
@@ -190,12 +171,10 @@ next:
 	TransDisk2 xdisk;
 
 	int e = xdisk.Connect(port, baud, fastrecv);
-	//printf("does it work");
-			
+
 	if (e != XComm2::s_ok)
 	{
-		//printf("é€šä¿¡ãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ–ã«å¤±æ•—ã—ã¾ã—ãŸ(%d).\n", e);
-		printf("Failed to initialize serial device(%d).\n", e);
+		printf("’ÊMƒfƒoƒCƒX‚Ì‰Šú‰»‚É¸”s‚µ‚Ü‚µ‚½(%d).\n", e);
 		return 1;
 	}
 	
@@ -207,8 +186,7 @@ next:
 			if (!file.Open(filename, FileIO::openalways) 
 				|| (file.GetFlags() & FileIO::readonly))
 			{
-				//fprintf(stderr, "ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œã‚Œã¾ã›ã‚“.\n");
-				fprintf(stderr, "Could not create file.\n");
+				fprintf(stderr, "ƒtƒ@ƒCƒ‹‚ğì‚ê‚Ü‚¹‚ñ.\n");
 				return 1;
 			}
 			D88Seek(file, 99999);
@@ -226,19 +204,18 @@ next:
 		{
 			FileIO file;
 			
-			//_mbstok((uchar*) filename, (uchar*) ";");
-			//char* x = (char*) _mbstok(0, (uchar*) ";");
-			int index = 1;//x ? atoi(x) : 1;
+			_mbstok((uchar*) filename, (uchar*) ";");
+			char* x = (char*) _mbstok(0, (uchar*) ";");
+			int index = x ? atoi(x) : 1;
+
 			if (!file.Open(filename, FileIO::readonly))
 			{
-				//fprintf(stderr, "ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã‘ã¾ã›ã‚“.\n");
-				fprintf(stderr, "Could not open file.\n");
+				fprintf(stderr, "ƒtƒ@ƒCƒ‹‚ğŠJ‚¯‚Ü‚¹‚ñ.\n");
 				return 1;
 			}
 			if (!D88Seek(file, index))
 			{
-				//fprintf(stderr, "æŒ‡å®šã•ã‚ŒãŸãƒ‡ã‚£ã‚¹ã‚¯ãŒã‚ã‚Šã¾ã›ã‚“.\n");
-				fprintf(stderr, "Given disk does not exist.\n");
+				fprintf(stderr, "w’è‚³‚ê‚½ƒfƒBƒXƒN‚ª‚ ‚è‚Ü‚¹‚ñ.\n");
 				return 1;
 			}
 			xdisk.SendDisk(drive-1, file);
@@ -252,8 +229,7 @@ next:
 	default:
 		Usage();
 	}
-	//printf("çµ‚äº†ã—ã¾ã—ãŸã€‚\n");
-	printf("Completed.\n");
+	printf("I—¹‚µ‚Ü‚µ‚½B\n");
 	return 0;
 }
 
@@ -289,36 +265,27 @@ static bool D88Seek(FileIO& fio, int index)
 
 void Usage()
 {
-	/*printf(
+	printf(
 		   "usage:\n"
 		   "  xdisk2 b [-p#]\n"
-		   "          PC-8801 å´ã«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’è»¢é€ã™ã‚‹\n"
+		   "          PC-8801 ‘¤‚ÉƒvƒƒOƒ‰ƒ€‚ğ“]‘—‚·‚é\n"
 		   "  xdisk2 s [-p#] [-19s]\n"
-		   "          PC-8801 ã® ROM ãƒ‡ãƒ¼ã‚¿ã‚’å¸ã„å‡ºã™\n"
+		   "          PC-8801 ‚Ì ROM ƒf[ƒ^‚ğ‹z‚¢o‚·\n"
 		   "  xdisk2 r [-p#] [-d#] [-m#] [-19svw] [-t \"title\"] <disk.d88>\n"
-		   "          ãƒ‡ã‚£ã‚¹ã‚¯ã‹ã‚‰ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ä½œæˆã™ã‚‹\n"
+		   "          ƒfƒBƒXƒN‚©‚çƒfƒBƒXƒNƒCƒ[ƒW‚ğì¬‚·‚é\n"
 		   "  xdisk2 w [-p#] [-d#] [-19v] <disk.d88(;#)>\n"
-		   "          ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ã«æ›¸ãå‡ºã™\n"
+		   "          ƒfƒBƒXƒNƒCƒ[ƒW‚ğƒfƒBƒXƒN‚É‘‚«o‚·\n"
 		   "\n"
 		   "option:\n"
-           "    -p#   é€šä¿¡ãƒãƒ¼ãƒˆç•ªå·ã‚’æŒ‡å®š\n"
-           "    -1/-9 19200/9600 bps ã§é€šä¿¡\n"
-		   "    -d#   èª­ã¿æ›¸ãã«ä½¿ç”¨ã™ã‚‹ãƒ‰ãƒ©ã‚¤ãƒ–ç•ªå·ã‚’æŒ‡å®š\n"
-		   "    -m#   èª­ã¿å‡ºã™ãƒ‡ã‚£ã‚¹ã‚¯ã®ãƒ¡ãƒ‡ã‚£ã‚¢ã‚’æŒ‡å®š(0:2D 1:2DD 2:2HD)\n"
-		   "    -v    è©³ç´°å‡ºåŠ›\n"
-		   "    -w    èª­ã¿è¾¼ã‚“ã ã‚¤ãƒ¡ãƒ¼ã‚¸ã«ãƒ©ã‚¤ãƒˆãƒ—ãƒ­ãƒ†ã‚¯ãƒˆã‚’ã‹ã‘ã‚‹\n"
-		   "    -s    88 -> PC é–“ã§é«˜é€Ÿè»¢é€ã‚’è¡Œã‚ãªã„ (19200 bps æ™‚ã®ã¿)\n"
-		   "    -t    ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã‚¿ã‚¤ãƒˆãƒ«ã‚’æŒ‡å®šã™ã‚‹\n"
+           "    -p#   ’ÊMƒ|[ƒg”Ô†‚ğw’è\n"
+           "    -1/-9 19200/9600 bps ‚Å’ÊM\n"
+		   "    -d#   “Ç‚İ‘‚«‚Ég—p‚·‚éƒhƒ‰ƒCƒu”Ô†‚ğw’è\n"
+		   "    -m#   “Ç‚İo‚·ƒfƒBƒXƒN‚ÌƒƒfƒBƒA‚ğw’è(0:2D 1:2DD 2:2HD)\n"
+		   "    -v    Ú×o—Í\n"
+		   "    -w    “Ç‚İ‚ñ‚¾ƒCƒ[ƒW‚Éƒ‰ƒCƒgƒvƒƒeƒNƒg‚ğ‚©‚¯‚é\n"
+		   "    -s    88 -> PC ŠÔ‚Å‚‘¬“]‘—‚ğs‚í‚È‚¢ (19200 bps ‚Ì‚İ)\n"
+		   "    -t    ƒfƒBƒXƒNƒCƒ[ƒW‚Ìƒ^ƒCƒgƒ‹‚ğw’è‚·‚é\n"
 		  );
-	*/
-	printf(
-		"usage:\n"
-		"  xdisk3 w [-p#] [-d#] [-19v] <disk.d88>\n"
-		"	Write disk image to disk.\n"
-		"\n"
-		"Notes: -Only 9600 baud supported atm, and it's slow. :(\n"
-		"       -Hint: Use \'$ ls /dev/ttyUSB*\' to show connected USB devices.\n"
-		"\n"
-	);
+
 	exit(1);
 }

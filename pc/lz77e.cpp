@@ -100,7 +100,7 @@ inline void LZ77Enc::EmitChar(uint c)
 }
 
 /*
-	1 [xx]			ï¿½ï¿½ï¿½ï¿½ï¿½k
+	1 [xx]			–³ˆ³k
 	0 [xx] 0		near (3 bytes)
 	0 [00]			end
 	0 [xx] 1x1		200h
@@ -226,7 +226,7 @@ int  LZ77Enc::Encode(const void* _s, int len, uint8* _d, uint dsize)
 	uint h = Hash(src);
 	AddHashTable(src, h);
 	
-	const uint8* s = src;
+	const uint8* ss = src;
 	for (const uint8* s = src+1; s < srctop-2; )
 	{
 		int best = threshold - 1;

@@ -1,107 +1,107 @@
 TransDisk 2.0
-通信プロトコル
+�ʐM�v���g�R��
 
 $Id: protocol.txt,v 1.2 2000/01/06 01:51:17 cisc Exp $
 
-概要
-	PC-8801 と Windows マシンをシリアルクロスケーブルで接続し，
-	1. ディスクイメージの吸出し
-	2. ディスクイメージの書き出し
-	3. ROM データの吸出し
-	の 3種類の転送を行う．
+�T�v
+	PC-8801 �� Windows �}�V�����V���A���N���X�P�[�u���Őڑ����C
+	1. �f�B�X�N�C���[�W�̋z�o��
+	2. �f�B�X�N�C���[�W�̏����o��
+	3. ROM �f�[�^�̋z�o��
+	�� 3��ނ̓]�����s���D
 	
-転送プロトコル
-	データ交換にはシリアル通信を用いる．
-	PC8801 側から発信する場合は機械の仕様限界を超えた 38400 bps による
-	転送を試みる．
-	このため，バイト落ちなどのエラー検出に対応できるプロトコルが必要．
+�]���v���g�R��
+	�f�[�^�����ɂ̓V���A���ʐM��p����D
+	PC8801 �����甭�M����ꍇ�͋@�B�̎d�l���E�𒴂��� 38400 bps �ɂ��
+	�]�������݂�D
+	���̂��߁C�o�C�g�����Ȃǂ̃G���[���o�ɑΉ��ł���v���g�R�����K�v�D
 	
-	仕様
-		PC->88 方向に対するコマンド形式とする
-		PC は 88 のコマンド実行を中断できることとする
-		88->PC においては x1 モードを使った高速転送の使用を試みる
-		転送はパケット単位で行い，毎回 CRC チェックを行う
-		88 側にはパケットの再送コマンドを持たせる
+	�d�l
+		PC->88 �����ɑ΂���R�}���h�`���Ƃ���
+		PC �� 88 �̃R�}���h���s�𒆒f�ł��邱�ƂƂ���
+		88->PC �ɂ����Ă� x1 ���[�h���g���������]���̎g�p�����݂�
+		�]���̓p�P�b�g�P�ʂōs���C���� CRC �`�F�b�N���s��
+		88 ���ɂ̓p�P�b�g�̍đ��R�}���h����������
 		
-	コマンドのやり取り
+	�R�}���h�̂����
 		PC		88
-		CMD 送信 ->
-				CMD 受信
-			 <-	ACK 送信
-		ACK 受信
-				CMD 実行
-			 <-	結果送信
-		結果受信
+		CMD ���M ->
+				CMD ��M
+			 <-	ACK ���M
+		ACK ��M
+				CMD ���s
+			 <-	���ʑ��M
+		���ʎ�M
 		
-		再送が必要な場合 CMD として 88 側に送る
+		�đ����K�v�ȏꍇ CMD �Ƃ��� 88 ���ɑ���
 
-コマンド
-制御に関するコマンド
+�R�}���h
+����Ɋւ���R�}���h
 	SendXDISKState
 		arg:	[01] none
 		res:	VERH VERL FDDTYPE ROMTYPE SIOTYPE
-		xdisk のバージョンや 88 に関する情報を送る
+		xdisk �̃o�[�W������ 88 �Ɋւ�����𑗂�
 		
-		FDDTYPE	2HD 機か否か
-		ROMTYPE 搭載されている ROM の種類
-			(b0:漢1, b1:漢2, b2:辞, b3:CD)
-		SIOTYPE	bps を変更可能か(38400bps 転送は行えるか)
+		FDDTYPE	2HD �@���ۂ�
+		ROMTYPE ���ڂ���Ă��� ROM �̎��
+			(b0:��1, b1:��2, b2:��, b3:CD)
+		SIOTYPE	bps ��ύX�\��(38400bps �]���͍s���邩)
 		
 	Completed
 		arg:	[00] none
 		res:	none
-		終了メッセージを表示する
+		�I�����b�Z�[�W��\������
 		
 	QuitXDISK
 		arg:	[06] none
 		res:	none
-		XDISK を終了する
+		XDISK ���I������
 		
 	SendLastPacket
 		arg:	[08]
 		res:	data
-		最後に転送したパケットをもう一度送り直す
+		�Ō�ɓ]�������p�P�b�g��������x���蒼��
 
-ディスクに関するコマンド
+�f�B�X�N�Ɋւ���R�}���h
 	SetDrive
 		arg:	[02] DRIVE TYPE
 		res:	TYPE
 		
-		TYPE	0=2D, 1=2DD, 2=2HD, -1=自動
-			bit7:書込み可能か確認
+		TYPE	0=2D, 1=2DD, 2=2HD, -1=����
+			bit7:�����݉\���m�F
 		
-		以降のコマンドでアクセスするディスクドライブと種類を設定する
-		TYPE に「自動」を選択すると 88 側でディスクの種類を判断する
+		�ȍ~�̃R�}���h�ŃA�N�Z�X����f�B�X�N�h���C�u�Ǝ�ނ�ݒ肷��
+		TYPE �Ɂu�����v��I������� 88 ���Ńf�B�X�N�̎�ނ𔻒f����
 
-ディスクイメージの吸出しに関するコマンド
+�f�B�X�N�C���[�W�̋z�o���Ɋւ���R�}���h
 	ReadTrack
 		arg:	[03] TRACK
-		res:	成否
-		指定されたトラックを読み込む
+		res:	����
+		�w�肳�ꂽ�g���b�N��ǂݍ���
 		
 	SendTrack
 		arg:	[04] MODE
 		res:	TRACKDATA
-		ReadTrack で読み込んだトラックデータを転送する
-		MODE では高速転送を行うか否かを設定する
+		ReadTrack �œǂݍ��񂾃g���b�N�f�[�^��]������
+		MODE �ł͍����]�����s�����ۂ���ݒ肷��
 		
 	SendAndReadTrack
 		arg:	[05] TRACK MODE
 		res:	TRACKDATA
-		前回読み込んだトラックデータを転送し，それと並列して指定された
-		トラックを読み込む
+		�O��ǂݍ��񂾃g���b�N�f�[�^��]�����C����ƕ��񂵂Ďw�肳�ꂽ
+		�g���b�N��ǂݍ���
 		
-ディスクイメージの書き出しに関するコマンド
+�f�B�X�N�C���[�W�̏����o���Ɋւ���R�}���h
 	WriteTrack
 		arg:	[09] TRACK WRITESEQ
 		res:	
-		送ったトラックデータをディスクに書き込む
+		�������g���b�N�f�[�^���f�B�X�N�ɏ�������
 		
-ROM データの吸出しに関するコマンド
+ROM �f�[�^�̋z�o���Ɋւ���R�}���h
 	SendMemory
 		arg:	[07] INDEX MODE
 		res:	ROMDATA
-		ROM データ(1000h 分)を送信する
+		ROM �f�[�^(1000h ��)�𑗐M����
 		
 		INDEX
 			00-1F	KANJI ROM (00-07 ... f8-ff)
@@ -111,64 +111,64 @@ ROM データの吸出しに関するコマンド
 			50-57	EROM0-3
 			58-59	DISK ROM
 			60-6f	CDBIOS ROM
-			70-EF	辞書 ROM
+			70-EF	���� ROM
 		
 
-パケットのフォーマット
-	ヘッダ文字
+�p�P�b�g�̃t�H�[�}�b�g
+	�w�b�_����
 		'!'
-			コマンドパケットは常に 0x21 から始まる
-			88 側はこの文字を受け取った時点で実行中の処理を中断し
-			コマンドの実行に備える
+			�R�}���h�p�P�b�g�͏�� 0x21 ����n�܂�
+			88 ���͂��̕������󂯎�������_�Ŏ��s���̏����𒆒f��
+			�R�}���h�̎��s�ɔ�����
 		'%'	
-			88 側がパケットを受領すると即座に応答を返す
-			PC はこのパケットを受領し，パケット番号が一致していることを
-			確認することで 88 側がコマンドを実行することを確認できる．
+			88 �����p�P�b�g����̂���Ƒ����ɉ�����Ԃ�
+			PC �͂��̃p�P�b�g����̂��C�p�P�b�g�ԍ�����v���Ă��邱�Ƃ�
+			�m�F���邱�Ƃ� 88 �����R�}���h�����s���邱�Ƃ��m�F�ł���D
 		'#','$'
-			結果などのデータパケットを示す
-			88 側の転送の場合 必要に応じて 38400 bps で転送される
-			'$' の場合圧縮がかけてある
+			���ʂȂǂ̃f�[�^�p�P�b�g������
+			88 ���̓]���̏ꍇ �K�v�ɉ����� 38400 bps �œ]�������
+			'$' �̏ꍇ���k�������Ă���
 	
-	パケット内構造
-		8bit -> 7bit に符号化，40h - bfh の文字を使う
-		パケット受領中にこれ以外の文字を読み込んだ場合エラーとする
+	�p�P�b�g���\��
+		8bit -> 7bit �ɕ������C40h - bfh �̕������g��
+		�p�P�b�g��̒��ɂ���ȊO�̕�����ǂݍ��񂾏ꍇ�G���[�Ƃ���
 		
-		+0.w	パケット番号
-		+2.w	データサイズ
-		+4...	データ
+		+0.w	�p�P�b�g�ԍ�
+		+2.w	�f�[�^�T�C�Y
+		+4...	�f�[�^
 		+?.w	CRC
 		
-		CRC をチェックし，正しい値であると判断できたら
-		その時点で正しいパケットを受領したことになる．
+		CRC ���`�F�b�N���C�������l�ł���Ɣ��f�ł�����
+		���̎��_�Ő������p�P�b�g����̂������ƂɂȂ�D
 		
 
-パケット圧縮に関して
-	トラックやROMデータを転送する場合は簡単な圧縮を行う
-	88->PC は RLE フォーマットを使う
-		+0.w	b15:14  00 無圧縮 / 01 RLE 圧縮
-			b13:0	展開後のパケットサイズ
-		RLE 圧縮のフォーマット
-		1 バイト読み込んで MSB が 1 だったら, 次に続く1バイトを(b6:0)+3 byte 続ける
-		0 だったら次に続く (b6:0)+1 byte 分コピー
+�p�P�b�g���k�Ɋւ���
+	�g���b�N��ROM�f�[�^��]������ꍇ�͊ȒP�Ȉ��k���s��
+	88->PC �� RLE �t�H�[�}�b�g���g��
+		+0.w	b15:14  00 �����k / 01 RLE ���k
+			b13:0	�W�J��̃p�P�b�g�T�C�Y
+		RLE ���k�̃t�H�[�}�b�g
+		1 �o�C�g�ǂݍ���� MSB �� 1 ��������, ���ɑ���1�o�C�g��(b6:0)+3 byte ������
+		0 �������玟�ɑ��� (b6:0)+1 byte ���R�s�[
 	
-	PC->88 は LZ77 圧縮を使う．
-	LZ77 圧縮をする場合最後の 2 バイトは展開後データの CRC となる
-		+0.w	b15:14  00 無圧縮 / 10 LZ77 圧縮
-			b13:0	展開後のパケットサイズ
+	PC->88 �� LZ77 ���k���g���D
+	LZ77 ���k������ꍇ�Ō�� 2 �o�C�g�͓W�J��f�[�^�� CRC �ƂȂ�
+		+0.w	b15:14  00 �����k / 10 LZ77 ���k
+			b13:0	�W�J��̃p�P�b�g�T�C�Y
 			
 		
-WriteTrack 用データのフォーマット
-	処理ブロックの繰り返しとなっている
+WriteTrack �p�f�[�^�̃t�H�[�}�b�g
+	�����u���b�N�̌J��Ԃ��ƂȂ��Ă���
 	
-	+0	処理内容(bit0-5) (bit6 は密度)
-		0: 終了
+	+0	�������e(bit0-5) (bit6 �͖��x)
+		0: �I��
 		1: WRITE ID
 			+1	length
-			+2	セクタ数
+			+2	�Z�N�^��
 			+3	gap3
 			+4	D
-			+5...	ID x セクタ数
-		2: WRITE DATA (bit7==1 なら DELETED)
+			+5...	ID x �Z�N�^��
+		2: WRITE DATA (bit7==1 �Ȃ� DELETED)
 			+1	ID
-			+5	データ長
-			+7...	データ
+			+5	�f�[�^��
+			+7...	�f�[�^
