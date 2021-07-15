@@ -167,6 +167,10 @@ void SIO::DCBToNix()
 			cfsetispeed(&dcb.config, (speed_t)B9600);
 			cfsetospeed(&dcb.config, (speed_t)B9600);
 			break;
+		case(19200):
+			cfsetispeed(&dcb.config, (speed_t)B19200);
+			cfsetospeed(&dcb.config, (speed_t)B19200);
+			break;
 		default:
 			break;
 	}
@@ -215,6 +219,7 @@ bool SIO::SetMode(int baud)
 	*/
 	//bool r = SetCommState(hfile, &dcb) != 0;
 	//SetTimeouts(timeouts);
+	dcb.BaudRate = baud;
 	DCBToNix();
 	int r = tcsetattr(serialport, TCSANOW, &dcb.config);
 	fcntl(serialport, F_SETFL, 0);
@@ -228,7 +233,10 @@ bool SIO::SetMode(int baud)
 void SIO::SetTimeouts(int rto)
 {
 	tcflush(serialport, TCIFLUSH);
-	dcb.config.c_cc[VTIME] = 3;
+	if(dcb.BaudRate == 9600)
+		dcb.config.c_cc[VTIME] = 3;
+	else 
+		dcb.config.c_cc[VTIME] = 2;
 	tcsetattr(serialport, TCSANOW, &dcb.config);
 
 	/*

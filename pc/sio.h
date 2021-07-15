@@ -11,13 +11,7 @@
 #define FALSE 0
 
 #include "types.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>     // unix
-#include <fcntl.h>      // file control
-#include <errno.h>      // error number definitions
-#include <termios.h>    // posix terminal stuff
-#include <sys/ioctl.h>
+#include "headers.h"
 // ---------------------------------------------------------------------------
 
 class DCB 
@@ -26,7 +20,6 @@ public:
 	uint32 BaudRate;	//	= baud;
 	struct termios config;
 	
-
 public:
 	DCB();
 	~DCB();
@@ -44,8 +37,6 @@ public:
 		ERRCONFIG,
 	};
 	char fpa[13] = "/dev/ttyUSB "; // 12 +1null
-	
-
 public:
 	SIO();
 	~SIO();
@@ -58,9 +49,7 @@ public:
 	void DCBToNix();
 private:
 	//HANDLE hfile;
-	//FILE* hfile; // file handler
 	int serialport;
-	//PORTINFO dcb;
 	DCB dcb;
 	int timeouts;
 };

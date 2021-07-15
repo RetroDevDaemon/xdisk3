@@ -192,7 +192,6 @@ uint XComm2::RecvPacket(uint8* buffer, int length, bool burst)
 	uint8 c;
 	//if (burst) 
 	//	unc = -1, sio.SetMode(baud * 2);
-	//unc = 1;
 	do
 	{
 		if (unc != -1)
