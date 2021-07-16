@@ -6,11 +6,13 @@
 
 Here are two that should work (note the PL2303 chipset):
 
-UGREEN USB 2.0 to RS232 DB9 Serial Cable Male A Converter Adapter with PL2303... https://www.amazon.com/dp/B00QUZY4WO/ref=cm_sw_r_tw_dp_0Z57FC0TDZ9WXKBM6D7E?_encoding=UTF8&psc=1 
+UGREEN USB 2.0 to RS232 DB9 Serial Cable Male A Converter Adapter with PL2303...<br>
+https://www.amazon.com/dp/B00QUZY4WO/ref=cm_sw_r_tw_dp_0Z57FC0TDZ9WXKBM6D7E?_encoding=UTF8&psc=1 
 
-StarTech.com 10 ft Cross Wired DB9 to DB25 Serial Null Modem Cable - F/M - Nu... https://www.amazon.com/dp/B00066HL50/ref=cm_sw_r_tw_dp_K69NMDKCXB9BBT7X9NH5 
+StarTech.com 10 ft Cross Wired DB9 to DB25 Serial Null Modem Cable - F/M - Nu...<br>
+https://www.amazon.com/dp/B00066HL50/ref=cm_sw_r_tw_dp_K69NMDKCXB9BBT7X9NH5 
 
-Combined, it should be around $15 USD.
+Combined, it should be around $15 USD. Note the serial cable that runs from the PC-88 must be a crossover cable!
 
 When the USB cable is plugged into your Raspbian (or other Linux) machine, it will show up as a device in the device path (`/dev`). Typically, it will take the first available USB port number. For me, it's always 0 on my Pi 400. The full path of the USB serial device becomes:
 `/dev/ttyUSB0`<br><br>
@@ -559,7 +561,15 @@ clean:
 	rm -rf ./*.o
 
 ```
-As far as sending the BASIC program, reading disks and ROMs, I'm not quite sure yet. Additional testing is appreciated.
-
-Source:
-http://github.com/bferguson3/xdisk3 
+As far as sending the BASIC program, reading disks and ROMs, I'm not quite sure yet. Additional testing is appreciated.<br>
+<br>
+Full source:<br>
+http://github.com/bferguson3/xdisk3 <br>
+<br>
+Sources used:<br>
+https://www.cmrr.umn.edu/~strupp/serial.html <br>
+https://en.wikibooks.org/wiki/Serial_Programming/termios <br>
+https://ftp.sjtu.edu.cn/Linux-HOWTO/HOWTO/Serial-HOWTO-20.html <br>
+<br>
+cisc's homepage: <br>
+http://retropc.net/cisc/ (xdisk207 source is in M88 > Downloads > Other (1).) <br>
