@@ -306,8 +306,9 @@ void Usage()
 		"  xdisk3 w [-p#] [-d#] [-19v] <disk.d88>\n"
 		"	Write disk image to disk.\n"
 		"\n"
-		"Notes: -Only 9600 baud supported atm, and it's slow. :(\n"
-		"       -Hint: Use \'$ ls /dev/ttyUSB*\' to show connected USB devices.\n"
+		"Note: Use \'ls /dev/ttyUSB*\' to show connected USB devices.\n"
+		" (You may need to modify source if your USB serial device has\n"
+		"  a different prefix.)\n"
 		"\n"
 	);
 	exit(1);
