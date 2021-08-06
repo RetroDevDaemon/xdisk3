@@ -2,6 +2,7 @@ OBJ:=main file lz77e pch sio xcom xdisk
 
 default: clean $(OBJ)
 	g++ -g -o xdisk3 ./*.o
+	rm *.o
 
 $(OBJ): %: %.cpp 
 	g++ -g -c $< -o $@.o

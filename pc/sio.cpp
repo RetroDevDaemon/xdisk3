@@ -101,6 +101,7 @@ SIO::Result SIO::Open(int port, int baud)
 
 	timeouts = 2000;
 	fpa[11] = port | 0x30;
+	printf("Using port: ");
 	printf(fpa);
 	printf("\n");
 	serialport = open(fpa, O_RDWR | O_NDELAY);

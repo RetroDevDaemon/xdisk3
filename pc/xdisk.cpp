@@ -317,7 +317,8 @@ bool TransDisk2::ReceiveROM()
 
 			for (int i=0; i<rominfo[j].blocks; i++)
 			{
-				printf("ROM データを受信中 (%d/%d)\r", ++n, nblks);
+				//printf("ROM データを受信中 (%d/%d)\r", ++n, nblks);
+				printf("Receiving ROM data (%d/%d)\r\n", ++n, nblks);
 				
 				uint8 cmd[3];
 				cmd[0] = 0x07;

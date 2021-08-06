@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-//	TransDisk 2.0
+//	TransDisk 3.0
 //	Copyright (C) cisc 2000.
 // ---------------------------------------------------------------------------
 //	$Id: main.cpp,v 1.11 2000/02/01 13:09:23 cisc Exp $
@@ -158,7 +158,7 @@ next:
 			while (fs > 0)
 			{
 				//printf("転送中 (%d%%).\r", (size-fs) * 100 / size);
-				printf("Transferring (%d%%).\r", (size-fs) * 100 / size);
+				printf("Transferring (%d%%).\r\n", (size-fs) * 100 / size);
 				uint8 buf[512];
 				uint ps = fs > sizeof(buf) ? sizeof(buf) : fs;
 				fio.Read(buf, ps);
@@ -180,7 +180,6 @@ next:
 	TransDisk2 xdisk;
 
 	int e = xdisk.Connect(port, baud, fastrecv);
-	//printf("does it work");
 			
 	if (e != XComm2::s_ok)
 	{
@@ -303,8 +302,23 @@ void Usage()
 	*/
 	printf(
 		"usage:\n"
+		"  xdisk3 b [-p#]\n"
+		"       Send the xdisk BASIC program to the PC-8801\n"
+		"  xdisk3 s [-p#] [-19s]\n"
+		"	Extract ROM data from the PC-8801\n"
+		"  xdisk3 r [-p#] [-d#] [-m#] [-19svw] [-t \"title\"] <disk.d88>\n"
+		"       Create disk image from physical disk\n"
 		"  xdisk3 w [-p#] [-d#] [-19v] <disk.d88>\n"
-		"	Write disk image to disk.\n"
+		"	Write local disk image to physical disk\n"
+		"\n"
+		"options:\n"
+		"    -p#   Port number\n"
+		"    -1/-9 Set 19200/9600 bps\n"
+		"    -d#   Designate target disk drive\n"
+		"    -m#   Set disk media type (0:2d 1:2dd 2:2HD)\n"
+		"    -v    Detailed output\n"
+		"    -w    Set write protect on output disk image\n"
+		"    -s    Don't use hi-speed transfer from 88->PC (19200 bps mode only)\n"
 		"\n"
 		"Note: Use \'ls /dev/ttyUSB*\' to show connected USB devices.\n"
 		" (You may need to modify source if your USB serial device has\n"
