@@ -31,12 +31,12 @@ XComm2::~XComm2()
 // ---------------------------------------------------------------------------
 //	�ڑ�
 //
-uint XComm2::Connect(int port, int _baud)
+uint XComm2::Connect(const std::string& serialDevice, int _baud)
 {
 	Disconnect();
 	baud = _baud;
 	
-	if (sio.Open(port, baud) != SIO::OK)
+	if (sio.Open(serialDevice, baud) != SIO::OK)
 		return e_port;
 	
 	sio.SetTimeouts(1000);

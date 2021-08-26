@@ -9,7 +9,8 @@
 
 #include "headers.h"
 #include "sio.h"
-
+#include <iostream>
+#include <sstream>
 
 extern bool verbose;
 
@@ -19,7 +20,7 @@ extern bool verbose;
 SIO::SIO()
 //: hfile(INVALID_HANDLE_VALUE)
 {
-	serialport = INVALID_HANDLE_VALUE;
+	hSerialPort = INVALID_HANDLE_VALUE;
 }
 
 DCB::DCB()
@@ -27,7 +28,7 @@ DCB::DCB()
 
 SIO::~SIO()
 {
-	if (serialport != INVALID_HANDLE_VALUE)
+	if (hSerialPort != INVALID_HANDLE_VALUE)
 		Close();
 }
 
@@ -43,7 +44,12 @@ SIO::Result SIO::Write(const void* src, int len)
 {
 	DWORD writtensize;
 	//printf("trying write...\n");
-	writtensize = write(serialport, src, len);//fwrite(src, 1, len, serialport);
+	writtensize = write(hSerialPort, src, len);
+
+	if(verbose) {
+		std::cout << "Wrote " << writtensize << " byte(s) of " << len << std::endl;
+	}
+
 	if(int(writtensize) == len) {
 		//printf("write ok\n");	
 		return OK;
@@ -70,7 +76,7 @@ SIO::Result SIO::Read(void* dest, int len)
 	size_t readsize;
 	for(int f = 0; f < 3; f++)
 	{
-		readsize = read(serialport, dest, len);// fread(dest, 1, len, hfile);
+		readsize = read(hSerialPort, dest, len);// fread(dest, 1, len, hfile);
 		if(readsize == len) f = 4;
 	}
 	//if (ReadFile(hfile, dest, len, &readsize, 0))
@@ -90,7 +96,7 @@ SIO::Result SIO::Read(void* dest, int len)
 // ---------------------------------------------------------------------------
 //	�ʐM�f�o�C�X���J��
 //
-SIO::Result SIO::Open(int port, int baud)
+SIO::Result SIO::Open(const std::string& serialDevice, int baud)
 {
 	//if (hfile != INVALID_HANDLE_VALUE)
 	//	Close();
@@ -100,11 +106,8 @@ SIO::Result SIO::Open(int port, int baud)
 	//printf(buf, "COM%d", port);
 
 	timeouts = 2000;
-	fpa[11] = port | 0x30;
-	printf("Using port: ");
-	printf(fpa);
-	printf("\n");
-	serialport = open(fpa, O_RDWR | O_NDELAY);
+
+	hSerialPort = open(serialDevice.c_str(), O_RDWR | O_NDELAY);
 	/*
 	hfile = CreateFile(	buf,
 				GENERIC_READ | GENERIC_WRITE,
@@ -123,13 +126,13 @@ SIO::Result SIO::Open(int port, int baud)
 	//dcb.DCBlength = sizeof(DCB);
 	//GetCommState(hfile, &dcb); < tcgetattr
 	// Get the current serial port status, try to set baud, and reset attr
-	tcgetattr(serialport, &dcb.config);
+	tcgetattr(hSerialPort, &dcb.config);
 	if (!SetMode(baud))
 	{
 		Close();
 		return ERRCONFIG;
 	}
-	tcflush(serialport, TCIFLUSH);
+	tcflush(hSerialPort, TCIFLUSH);
 	//PurgeComm(hfile, 
 	//	PURGE_TXABORT| // terminate write 
 	//	PURGE_TXCLEAR| // clear output buffer
@@ -143,13 +146,13 @@ SIO::Result SIO::Open(int port, int baud)
 //
 SIO::Result SIO::Close()
 {
-	if (serialport != INVALID_HANDLE_VALUE)
+	if (hSerialPort != INVALID_HANDLE_VALUE)
 	{
 		//PurgeComm(hfile, 
 		//	PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR);
 		//CloseHandle(hfile);
-		close(serialport);
-		serialport = INVALID_HANDLE_VALUE;
+		close(hSerialPort);
+		hSerialPort = INVALID_HANDLE_VALUE;
 	}
 	return OK;
 }
@@ -197,7 +200,7 @@ void SIO::DCBToNix()
 bool SIO::SetMode(int baud)
 {
 	//PurgeComm(hfile, PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR);
-	tcflush(serialport, TCIFLUSH);
+	tcflush(hSerialPort, TCIFLUSH);
 	/*
 	dcb.BaudRate		= baud;
 	dcb.fBinary		= TRUE;
@@ -222,8 +225,8 @@ bool SIO::SetMode(int baud)
 	//SetTimeouts(timeouts);
 	dcb.BaudRate = baud;
 	DCBToNix();
-	int r = tcsetattr(serialport, TCSANOW, &dcb.config);
-	fcntl(serialport, F_SETFL, 0);
+	int r = tcsetattr(hSerialPort, TCSANOW, &dcb.config);
+	fcntl(hSerialPort, F_SETFL, 0);
 	// 0 is a pass..
 
 	if(r == 0) r = 1;
@@ -233,12 +236,12 @@ bool SIO::SetMode(int baud)
 
 void SIO::SetTimeouts(int rto)
 {
-	tcflush(serialport, TCIFLUSH);
+	tcflush(hSerialPort, TCIFLUSH);
 	if(dcb.BaudRate == 9600)
 		dcb.config.c_cc[VTIME] = 3;
 	else 
 		dcb.config.c_cc[VTIME] = 2;
-	tcsetattr(serialport, TCSANOW, &dcb.config);
+	tcsetattr(hSerialPort, TCSANOW, &dcb.config);
 
 	/*
 	COMMTIMEOUTS cto;

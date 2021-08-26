@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-//	TransDisk/88 ‚Æ‚ÌŒğMƒNƒ‰ƒX
+//	TransDisk/88 ï¿½Æ‚ÌŒï¿½Mï¿½Nï¿½ï¿½ï¿½X
 //	Copyright (C) 2000 cisc.
 // ---------------------------------------------------------------------------
 //	$Id: xcom.h,v 1.2 2000/01/04 14:53:17 cisc Exp $
@@ -36,7 +36,7 @@ public:
 	XComm2();
 	~XComm2();
 
-	uint Connect(int port, int baud);
+	uint Connect(const std::string& serialDevice, int baud);
 	uint Disconnect();
 
 	uint SendPacket(const uint8* buffer, int length, bool cmd = false, bool dat = false);

@@ -11,6 +11,9 @@
 #include "xdisk.h"
 #include "file.h"
 
+#include <iostream>
+#include <sstream>
+
 void Usage();
 
 bool verbose;
@@ -32,7 +35,7 @@ int main(int ac, char** av)
 	verbose = false;
 	int media = -1;
 	uint baud = 19200;
-	uint port = 1;
+	std::string serialDevice;
 	int index = 1;
 
 	printf("TransDisk 3.%.2d\n"
@@ -43,11 +46,13 @@ int main(int ac, char** av)
 		Usage();
 	
 	int mode = tolower(av[1][0]);
-	
+	std::stringstream argbuf;
+
 	av += 2;
 	for (int i=2; i<ac; i++, av++)
 	{
 		char* arg = *av;
+		argbuf.str("");
 		
 		if (arg[0] == '-')
 		{
@@ -68,7 +73,13 @@ int main(int ac, char** av)
 					break;
 				
 				case 'p':
-					port = atoi(arg + j + 1);
+					// Start reading from arg + j + 1 until you hit whitespace
+					j += 1;
+					while(arg[j] != 0 && arg[j] != ' ') {
+						argbuf << arg[j];
+						j++;
+					}
+					serialDevice = argbuf.str();
 					goto next;
 
 				case 'm':
@@ -102,6 +113,7 @@ int main(int ac, char** av)
 					break;
 				
 				default:
+					std::cerr << "Unknown/unhandled argument " << arg << std::endl;
 					Usage();
 				}
 			}
@@ -109,6 +121,7 @@ int main(int ac, char** av)
 		else
 		{
 			if (filename)
+				// Specifying twice, bad
 				Usage();
 			filename = arg;
 		}
@@ -118,21 +131,32 @@ next:
 
 	if (mode == 'r' || mode == 'w')
 	{
-		if (!filename || (drive != 1 && drive != 2))
+		if (!filename)
 		{
+			std::cerr << "No filename was specified" << std::endl;
+			Usage();
+		}
+
+		if(drive != 1 && drive != 2) {
+			std::cerr << "Target drive was not specified" << std::endl;
+			Usage();
+		}
+
+		if(serialDevice == "") {
+			std::cerr << "Serial port device was not specified" << std::endl;
 			Usage();
 		}
 	}
 
 	//printf("通信ポート %d, %d bps で接続します.\n\n", port, baud);
-	printf("Connected to port %d at %d bps.\n\n", port, baud);
+	//printf("Connected to port %d at %d bps.\n\n", port, baud);
 	if (mode == 'b')
 	{
 		SIO sio;
-		if (SIO::OK != sio.Open(port, baud))
+		if (SIO::OK != sio.Open(serialDevice, baud))
 		{
 			//printf("通信デバイスの初期化に失敗しました.\n");
-			printf("Failed to initialize serial device.");
+			printf("Failed to initialize serial device '%s'.\n", serialDevice.c_str());
 			//printf("basic fail");
 			return 1;
 		}
@@ -179,12 +203,12 @@ next:
 
 	TransDisk2 xdisk;
 
-	int e = xdisk.Connect(port, baud, fastrecv);
+	int e = xdisk.Connect(serialDevice, baud, fastrecv);
 			
 	if (e != XComm2::s_ok)
 	{
 		//printf("通信デバイスの初期化に失敗しました(%d).\n", e);
-		printf("Failed to initialize serial device(%d).\n", e);
+		printf("Failed to initialize serial device '%s' (error=%d).\n", serialDevice.c_str(), e);
 		return 1;
 	}
 	
@@ -268,7 +292,7 @@ static bool D88Seek(FileIO& fio, int index)
 		pos += size;
 	}
 	if (verbose)
-		printf("disk index: %d\n");
+		printf("disk index: %d\n", index);
 	fio.SetLogicalOrigin(pos);
 	fio.Seek(0, FileIO::begin);
 	return true;
@@ -302,27 +326,23 @@ void Usage()
 	*/
 	printf(
 		"usage:\n"
-		"  xdisk3 b [-p#]\n"
+		"  xdisk3 b -p<device>\n"
 		"       Send the xdisk BASIC program to the PC-8801\n"
-		"  xdisk3 s [-p#] [-19s]\n"
+		"  xdisk3 s -p<device> [-19s]\n"
 		"	Extract ROM data from the PC-8801\n"
-		"  xdisk3 r [-p#] [-d#] [-m#] [-19svw] [-t \"title\"] <disk.d88>\n"
+		"  xdisk3 r -p<device> [-d#] [-m#] [-19svw] [-t \"title\"] <disk.d88>\n"
 		"       Create disk image from physical disk\n"
-		"  xdisk3 w [-p#] [-d#] [-19v] <disk.d88>\n"
+		"  xdisk3 w -p<device> [-d#] [-19v] <disk.d88>\n"
 		"	Write local disk image to physical disk\n"
 		"\n"
 		"options:\n"
-		"    -p#   Port number\n"
-		"    -1/-9 Set 19200/9600 bps\n"
-		"    -d#   Designate target disk drive\n"
-		"    -m#   Set disk media type (0:2d 1:2dd 2:2HD)\n"
-		"    -v    Detailed output\n"
-		"    -w    Set write protect on output disk image\n"
-		"    -s    Don't use hi-speed transfer from 88->PC (19200 bps mode only)\n"
-		"\n"
-		"Note: Use \'ls /dev/ttyUSB*\' to show connected USB devices.\n"
-		" (You may need to modify source if your USB serial device has\n"
-		"  a different prefix.)\n"
+		"    -p<device>  Unix path to the serial port device to use (e.g. /dev/ttyUSB0)\n"
+		"    -1/-9 	Set 19200/9600 bps\n"
+		"    -d#   	Designate target disk drive (1 or 2)\n"
+		"    -m#   	Set disk media type (0:2d 1:2dd 2:2HD)\n"
+		"    -v    	Detailed output\n"
+		"    -w		Set write protect flag on output disk image\n"
+		"    -s		Don't use hi-speed transfer from 88->PC (19200 bps mode only)\n"
 		"\n"
 	);
 	exit(1);
