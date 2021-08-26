@@ -26,9 +26,9 @@ TransDisk2::~TransDisk2()
 }
 
 
-uint TransDisk2::Connect(int port, int baud, bool bm)
+uint TransDisk2::Connect(const std::string& serialDevice, int baud, bool bm)
 {
-	uint r = XComm2::Connect(port, baud);
+	uint r = XComm2::Connect(serialDevice, baud);
 	//burst = (GetSysInfo()->siotype && baud == 19200) ? bm : false;
 	burst = false;
 	return r;

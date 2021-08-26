@@ -40,7 +40,7 @@ public:
 public:
 	SIO();
 	~SIO();
-	Result Open(int port, int baud);
+	Result Open(const std::string& serialDevice, int baud);
 	Result Close();
 	Result Read(void*, int);
 	Result Write(const void*, int);
@@ -49,8 +49,7 @@ public:
 	void DCBToNix();
 private:
 	//HANDLE hfile;
-	std::string serialDeviceRoot;
-	int serialport;
+	int hSerialPort;
 	DCB dcb;
 	int timeouts;
 };

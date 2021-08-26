@@ -11,6 +11,9 @@
 #include "xdisk.h"
 #include "file.h"
 
+#include <iostream>
+#include <sstream>
+
 void Usage();
 
 bool verbose;
@@ -32,7 +35,7 @@ int main(int ac, char** av)
 	verbose = false;
 	int media = -1;
 	uint baud = 19200;
-	uint port = 1;
+	std::string serialDevice;
 	int index = 1;
 
 	printf("TransDisk 3.%.2d\n"
@@ -43,11 +46,13 @@ int main(int ac, char** av)
 		Usage();
 	
 	int mode = tolower(av[1][0]);
-	
+	std::stringstream argbuf;
+
 	av += 2;
 	for (int i=2; i<ac; i++, av++)
 	{
 		char* arg = *av;
+		argbuf.str("");
 		
 		if (arg[0] == '-')
 		{
@@ -68,8 +73,14 @@ int main(int ac, char** av)
 					break;
 				
 				case 'p':
-					port = atoi(arg + j + 1);
-					goto next;
+					// Start reading from arg + j + 1 until you hit whitespace
+					j += 1;
+					while(arg[j] != 0 && arg[j] != ' ') {
+						argbuf << arg[j];
+						j++;
+					}
+					serialDevice = argbuf.str();
+					break;
 
 				case 'm':
 					media = atoi(arg + j + 1);
@@ -120,19 +131,20 @@ next:
 	{
 		if (!filename || (drive != 1 && drive != 2))
 		{
+			std::cout << "No filename was specified" << std::endl;
 			Usage();
 		}
 	}
 
 	//printf("通信ポート %d, %d bps で接続します.\n\n", port, baud);
-	printf("Connected to port %d at %d bps.\n\n", port, baud);
+	//printf("Connected to port %d at %d bps.\n\n", port, baud);
 	if (mode == 'b')
 	{
 		SIO sio;
-		if (SIO::OK != sio.Open(port, baud))
+		if (SIO::OK != sio.Open(serialDevice, baud))
 		{
 			//printf("通信デバイスの初期化に失敗しました.\n");
-			printf("Failed to initialize serial device.");
+			printf("Failed to initialize serial device.\n");
 			//printf("basic fail");
 			return 1;
 		}
@@ -179,12 +191,12 @@ next:
 
 	TransDisk2 xdisk;
 
-	int e = xdisk.Connect(port, baud, fastrecv);
+	int e = xdisk.Connect(serialDevice, baud, fastrecv);
 			
 	if (e != XComm2::s_ok)
 	{
 		//printf("通信デバイスの初期化に失敗しました(%d).\n", e);
-		printf("Failed to initialize serial device(%d).\n", e);
+		printf("Failed to initialize serial device (error=%d).\n", e);
 		return 1;
 	}
 	

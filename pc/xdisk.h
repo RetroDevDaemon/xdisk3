@@ -18,7 +18,7 @@ public:
 	TransDisk2();
 	~TransDisk2();
 	
-	uint Connect(int port, int baud, bool burst);
+	uint Connect(const std::string& serialDevice, int baud, bool burst);
 	bool ReceiveROM();
 	bool ReceiveDisk(int drive, int media, FileIO& file);
 	bool SendDisk(int drive, FileIO& file);
