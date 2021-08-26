@@ -47,7 +47,7 @@ SIO::Result SIO::Write(const void* src, int len)
 	writtensize = write(hSerialPort, src, len);
 
 	if(verbose) {
-		std::cout << "Wrote " << writtensize << " byte(s) of " << len << std::endl;
+	//	std::cout << "Wrote " << writtensize << " byte(s) of " << len << std::endl;
 	}
 
 	if(int(writtensize) == len) {
