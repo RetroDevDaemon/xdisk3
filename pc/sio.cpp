@@ -9,7 +9,8 @@
 
 #include "headers.h"
 #include "sio.h"
-
+#include <iostream>
+#include <sstream>
 
 extern bool verbose;
 
@@ -20,6 +21,7 @@ SIO::SIO()
 //: hfile(INVALID_HANDLE_VALUE)
 {
 	serialport = INVALID_HANDLE_VALUE;
+	serialDeviceRoot = "/dev/ttyUSB";
 }
 
 DCB::DCB()
@@ -100,9 +102,12 @@ SIO::Result SIO::Open(int port, int baud)
 	//printf(buf, "COM%d", port);
 
 	timeouts = 2000;
-	fpa[11] = port | 0x30;
-	printf("Using port: %s\n", fpa);
-	serialport = open(fpa, O_RDWR | O_NDELAY);
+
+	std::ostringstream serialDevice;
+	serialDevice << serialDeviceRoot << (port | 0x30);
+
+	std::cout << "Using port: " << serialDevice << std::endl;
+	serialport = open(serialDevice.str().c_str(), O_RDWR | O_NDELAY);
 	/*
 	hfile = CreateFile(	buf,
 				GENERIC_READ | GENERIC_WRITE,

@@ -268,7 +268,7 @@ static bool D88Seek(FileIO& fio, int index)
 		pos += size;
 	}
 	if (verbose)
-		printf("disk index: %d\n");
+		printf("disk index: %d\n", index);
 	fio.SetLogicalOrigin(pos);
 	fio.Seek(0, FileIO::begin);
 	return true;

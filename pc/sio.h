@@ -12,6 +12,7 @@
 
 #include "types.h"
 #include "headers.h"
+#include <string>
 // ---------------------------------------------------------------------------
 
 class DCB 
@@ -36,7 +37,6 @@ public:
 		ERROPEN,
 		ERRCONFIG,
 	};
-	char fpa[13] = "/dev/ttyUSB "; // 12 +1null
 public:
 	SIO();
 	~SIO();
@@ -49,6 +49,7 @@ public:
 	void DCBToNix();
 private:
 	//HANDLE hfile;
+	std::string serialDeviceRoot;
 	int serialport;
 	DCB dcb;
 	int timeouts;
