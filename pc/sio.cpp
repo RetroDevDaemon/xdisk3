@@ -108,6 +108,7 @@ SIO::Result SIO::Open(const std::string& serialDevice, int baud)
 	timeouts = 2000;
 
 	hSerialPort = open(serialDevice.c_str(), O_RDWR | O_NDELAY);
+	ASSERT_NO_ERROR(hSerialPort);
 	/*
 	hfile = CreateFile(	buf,
 				GENERIC_READ | GENERIC_WRITE,
@@ -126,13 +127,15 @@ SIO::Result SIO::Open(const std::string& serialDevice, int baud)
 	//dcb.DCBlength = sizeof(DCB);
 	//GetCommState(hfile, &dcb); < tcgetattr
 	// Get the current serial port status, try to set baud, and reset attr
-	assert(tcgetattr(hSerialPort, &dcb.config) >= 0);
+	int result = tcgetattr(hSerialPort, &dcb.config);
+	ASSERT_NO_ERROR(result);
 	if (!SetMode(baud))
 	{
 		Close();
 		return ERRCONFIG;
 	}
-	assert(tcflush(hSerialPort, TCIFLUSH) >= 0);
+	result = tcflush(hSerialPort, TCIFLUSH) >= 0;
+	ASSERT_NO_ERROR(result);
 	//PurgeComm(hfile, 
 	//	PURGE_TXABORT| // terminate write 
 	//	PURGE_TXCLEAR| // clear output buffer
