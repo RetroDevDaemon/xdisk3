@@ -32,4 +32,6 @@
 	#define min _MIN
 #endif
 
+#define ASSERT_NO_ERROR(result) if(result < 0) { fprintf(stderr, "%s:%i: Fatal error in last operation: %s\n", __FILE__, __LINE__, strerror(errno)); assert(result >= 0); }
+
 #endif	// WIN_HEADERS_H

@@ -108,6 +108,7 @@ SIO::Result SIO::Open(const std::string& serialDevice, int baud)
 	timeouts = 2000;
 
 	hSerialPort = open(serialDevice.c_str(), O_RDWR | O_NDELAY);
+	ASSERT_NO_ERROR(hSerialPort);
 	/*
 	hfile = CreateFile(	buf,
 				GENERIC_READ | GENERIC_WRITE,
@@ -126,13 +127,15 @@ SIO::Result SIO::Open(const std::string& serialDevice, int baud)
 	//dcb.DCBlength = sizeof(DCB);
 	//GetCommState(hfile, &dcb); < tcgetattr
 	// Get the current serial port status, try to set baud, and reset attr
-	tcgetattr(hSerialPort, &dcb.config);
+	int result = tcgetattr(hSerialPort, &dcb.config);
+	ASSERT_NO_ERROR(result);
 	if (!SetMode(baud))
 	{
 		Close();
 		return ERRCONFIG;
 	}
-	tcflush(hSerialPort, TCIFLUSH);
+	result = tcflush(hSerialPort, TCIFLUSH) >= 0;
+	ASSERT_NO_ERROR(result);
 	//PurgeComm(hfile, 
 	//	PURGE_TXABORT| // terminate write 
 	//	PURGE_TXCLEAR| // clear output buffer
@@ -200,7 +203,7 @@ void SIO::DCBToNix()
 bool SIO::SetMode(int baud)
 {
 	//PurgeComm(hfile, PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR);
-	tcflush(hSerialPort, TCIFLUSH);
+	assert(tcflush(hSerialPort, TCIFLUSH) >= 0);
 	/*
 	dcb.BaudRate		= baud;
 	dcb.fBinary		= TRUE;
@@ -226,7 +229,8 @@ bool SIO::SetMode(int baud)
 	dcb.BaudRate = baud;
 	DCBToNix();
 	int r = tcsetattr(hSerialPort, TCSANOW, &dcb.config);
-	fcntl(hSerialPort, F_SETFL, 0);
+	assert(fcntl(hSerialPort, F_SETFL, 0) >= 0);
+	assert(r >= 0);
 	// 0 is a pass..
 
 	if(r == 0) r = 1;
@@ -236,12 +240,12 @@ bool SIO::SetMode(int baud)
 
 void SIO::SetTimeouts(int rto)
 {
-	tcflush(hSerialPort, TCIFLUSH);
+	assert(tcflush(hSerialPort, TCIFLUSH) >= 0);
 	if(dcb.BaudRate == 9600)
 		dcb.config.c_cc[VTIME] = 3;
 	else 
 		dcb.config.c_cc[VTIME] = 2;
-	tcsetattr(hSerialPort, TCSANOW, &dcb.config);
+	assert(tcsetattr(hSerialPort, TCSANOW, &dcb.config) >= 0);
 
 	/*
 	COMMTIMEOUTS cto;
