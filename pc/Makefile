@@ -1,12 +1,14 @@
-OBJ:=main file lz77e pch sio xcom xdisk 
-CC_OPTS=-g
+#   Use Gnu Make for this.
 
-default: clean $(OBJ)
-	g++ $(CC_OPTS) -o xdisk3 ./*.o
-	rm *.o
+SRCS := $(wildcard *.cpp)
+OBJS := $(SRCS:.cpp=.o)
 
-$(OBJ): %: %.cpp 
-	g++ $(CC_OPTS) -c $< -o $@.o
+CPPFLAGS = -g
+
+xdisk3: $(OBJS)
+	g++ $(CPPFLAGS) -o $@ $^
+
+.PHONY: clean
 
 clean:
-	rm -rf ./*.o
+	rm -f $(OBJS)
